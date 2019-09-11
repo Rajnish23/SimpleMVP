@@ -14,11 +14,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.simplemvp.MvpApplication;
 import com.android.simplemvp.R;
 import com.android.simplemvp.presentation.UserPresenter;
 import com.android.simplemvp.repository.UserRepositoryImpl;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+
+import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,13 +30,18 @@ public class UserFragment extends Fragment implements UserView {
 
     private TextInputEditText nameEditText, cityEditText;
     private Button submitButton;
-    private UserPresenter userPresenter;
+    @Inject
+    UserPresenter userPresenter;
 
 
     public UserFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((MvpApplication)getActivity().getApplication()).getAppComponent().inject(this);    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,16 +61,10 @@ public class UserFragment extends Fragment implements UserView {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if(getActivity() != null) {
-            userPresenter = new UserPresenterImpl(new UserRepositoryImpl(getActivity().getApplicationContext()));
-        }
-
+    public void onResume() {
+        super.onResume();
         userPresenter.setView(this);
     }
-
-
 
     @Override
     public String getName() {

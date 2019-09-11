@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.simplemvp.MvpApplication;
 import com.android.simplemvp.R;
 import com.android.simplemvp.adapter.UserListAdapter;
 import com.android.simplemvp.presentation.HomePresenter;
@@ -20,6 +21,8 @@ import com.android.simplemvp.repository.UserRepositoryImpl;
 import com.android.simplemvp.repository.entity.User;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,12 +32,19 @@ public class HomeFragment extends Fragment implements HomeView {
     private static final String TAG = "HomeFragment";
 
     private RecyclerView recyclerView;
-    private HomePresenter homePresenter;
+
+    @Inject
+    HomePresenter homePresenter;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((MvpApplication)getActivity().getApplication()).getAppComponent().inject(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,15 +59,13 @@ public class HomeFragment extends Fragment implements HomeView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(getActivity() != null){
-            homePresenter = new HomePresenterImpl(new UserRepositoryImpl(getActivity().getApplicationContext()));
-        }
-        homePresenter.setView(this);
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        homePresenter.setView(this);
         homePresenter.getAllUser();
 
     }
